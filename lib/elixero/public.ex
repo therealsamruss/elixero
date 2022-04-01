@@ -21,6 +21,15 @@ defmodule EliXero.Public do
     URI.decode_query(response.body) |> Map.merge(resp)
   end
 
+  def renew_access_token(access_token) do
+    access_token_url = EliXero.Utils.Urls.access_token
+    header = EliXero.Utils.Oauth.create_auth_header("GET", access_token_url, [ oauth_token: access_token["oauth_token"], oauth_session_handle: access_token["oauth_session_handle"] ])
+    response = EliXero.Utils.Http.get(access_token_url, header)
+
+    resp = %{"http_status_code" => response.status_code}
+    URI.decode_query(response.body) |> Map.merge(resp)
+  end
+
   ### Api functions
 
   def find(access_token, resource, api_type) do

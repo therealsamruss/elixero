@@ -2,11 +2,7 @@ defmodule EliXero.CoreApi.Common do
   @api_type :core
 
   def find(client, resource) do
-    case client.app_type do
-      :private -> EliXero.Private.find(client.access_token, resource, @api_type)
-      :public -> EliXero.Public.find(client.access_token, resource, @api_type)
-      :partner -> EliXero.Partner.find(client.access_token, resource, @api_type)
-    end
+    EliXero.Public.find(client.access_token, resource, @api_type)
   end
 
   def find(client, resource,  identifier) do
@@ -25,38 +21,22 @@ defmodule EliXero.CoreApi.Common do
         []
       end      
 
-    case client.app_type do
-      :private -> EliXero.Private.find(client.access_token, resource, @api_type, query_filters, extra_headers)
-      :public -> EliXero.Public.find(client.access_token, resource, @api_type, query_filters, extra_headers)
-      :partner -> EliXero.Partner.find(client.access_token, resource, @api_type, query_filters, extra_headers)
-    end
+    EliXero.Public.find(client.access_token, resource, @api_type, query_filters, extra_headers)
   end
 
   def create(client, resource, object_map) do
-    case client.app_type do
-      :private -> EliXero.Private.create(client.access_token, resource, @api_type, object_map)
-      :public -> EliXero.Public.create(client.access_token, resource, @api_type, object_map)
-      :partner -> EliXero.Partner.create(client.access_token, resource, @api_type, object_map)
-    end
+    EliXero.Public.create(client.access_token, resource, @api_type, object_map)
   end
 
   def update(client, resource, identifier, object_map) do
     resource = resource <> "/" <> identifier
 
-    case client.app_type do
-      :private -> EliXero.Private.update(client.access_token, resource, @api_type, object_map)
-      :public -> EliXero.Public.update(client.access_token, resource, @api_type, object_map)
-      :partner -> EliXero.Partner.update(client.access_token, resource, @api_type, object_map)
-    end
+    EliXero.Public.update(client.access_token, resource, @api_type, object_map)
   end
 
   def delete(client, resource, identifier) do
     resource = resource <> "/" <> identifier
 
-    case client.app_type do
-      :private -> EliXero.Private.delete(client.access_token, resource, @api_type)
-      :public -> EliXero.Public.find(client.access_token, resource, @api_type)
-      :partner -> EliXero.Partner.find(client.access_token, resource, @api_type)
-    end
+    EliXero.Public.find(client.access_token, resource, @api_type)
   end
 end

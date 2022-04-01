@@ -4,7 +4,7 @@ defmodule EliXero.Mixfile do
   def project do
     [app: :elixero,
      version: "0.1.1",
-     elixir: "~> 1.3",
+     elixir: "~> 1.13",
      description: description(),
      package: package(),
      deps: deps()]
@@ -19,7 +19,7 @@ defmodule EliXero.Mixfile do
       {:httpoison, "~> 0.9"},
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:poison, "~> 3.0"},
-      {:ecto, "~> 2.1"}
+      {:ecto, "~> 3.7.2"}
     ]
   end
 
@@ -31,9 +31,9 @@ defmodule EliXero.Mixfile do
 
   defp package do
     [
-      maintainers: ["MJMortimer"],
+      maintainers: ["muszbek"],
       licenses: ["MIT"],
-      links: %{"Github" => "https://github.com/MJMortimer/elixero"}
+      links: %{"Github" => "https://github.com/muszbek/elixero"}
     ]
   end
 end

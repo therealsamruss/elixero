@@ -32,33 +32,21 @@ defmodule EliXero.CoreApi.ContactGroups do
   def add_to_group(client, identifier, contacts_map) do
     resource = @resource <> "/" <> identifier <> "/contacts"
 
-    case client.app_type do
-      :private -> EliXero.Private.create(client.access_token, resource, @api_type, contacts_map)
-      :public -> EliXero.Public.create(client.access_token, resource, @api_type, contacts_map)
-      :partner -> EliXero.Partner.create(client.access_token, resource, @api_type, contacts_map)
-    end
+    EliXero.Public.create(client.access_token, resource, @api_type, contacts_map)
     |> EliXero.CoreApi.Utils.ResponseHandler.handle_response(@contacts_model_module)    
   end
 
   def remove_contact(client, contact_group_identifier, contact_identifier) do
     resource = @resource <> "/" <> contact_group_identifier <> "/contacts/" <> contact_identifier
 
-    case client.app_type do
-      :private -> EliXero.Private.delete(client.access_token, resource, @api_type)
-      :public -> EliXero.Public.delete(client.access_token, resource, @api_type)
-      :partner -> EliXero.Partner.delete(client.access_token, resource, @api_type)
-    end
+    EliXero.Public.delete(client.access_token, resource, @api_type)
     |> EliXero.CoreApi.Utils.ResponseHandler.handle_response(@model_module)  
   end
 
   def remove_all_contacts(client, identifier) do
     resource = @resource <> "/" <> identifier <> "/contacts"
 
-    case client.app_type do
-      :private -> EliXero.Private.delete(client.access_token, resource, @api_type)
-      :public -> EliXero.Public.delete(client.access_token, resource, @api_type)
-      :partner -> EliXero.Partner.delete(client.access_token, resource, @api_type)
-    end
+    EliXero.Public.delete(client.access_token, resource, @api_type)
     |> EliXero.CoreApi.Utils.ResponseHandler.handle_response(@model_module)  
   end
 end
