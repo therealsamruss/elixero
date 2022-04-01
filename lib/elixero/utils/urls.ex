@@ -2,9 +2,9 @@ defmodule EliXero.Utils.Urls do
 
   #urls
   @base_url "https://api.xero.com/"
-  @request_token_url @base_url <> "oauth/RequestToken"
-  @access_token_url @base_url <> "oauth/AccessToken"
-  @authorise_url @base_url <> "oauth/Authorize"
+  @authorize_url "https://login.xero.com/identity/connect/authorize"
+  @access_token_url "https://identity.xero.com/connect/token"
+  @tenants_url @base_url <> "connection"
 
   #api_types
   @core_api "api.xro/2.0/"
@@ -12,16 +12,21 @@ defmodule EliXero.Utils.Urls do
   @files_api "files.xro/1.0/"
   @assets_api "assets.xro/1.0/"
 
-  def request_token do
-    @request_token_url
+  def authorize() do
+    EliXero.Utils.Helpers.random_string(8)
+    |> authorize()
   end
-
-  def authorise(oauth_token) do
-    @authorise_url <> "?oauth_token=" <> oauth_token
+  
+  def authorize(validator) do
+    @authorize_url <> "?" <> authorize_params(validator)
   end
-
+  
   def access_token do
     @access_token_url
+  end
+
+  def tenants do
+    @tenants_url
   end
 
   def api(resource, api_type) do
@@ -46,4 +51,23 @@ defmodule EliXero.Utils.Urls do
     url <> "?" <> query_param_string
   end
 
+  defp authorize_params(validator) do
+    authorize_params(validator, default_scope())
+  end
+  
+  defp authorize_params(validator, scope) do
+    [
+      {:response_type, "code"},
+      {:client_id, Application.get_env(:elixero, :client_id)},
+      {:redirect_uri, Application.get_env(:elixero, :callback_url)},
+      {:scope, Enum.join(scope, " ")},
+      {:state, validator}
+    ]
+    |> EliXero.Utils.Helpers.join_params_keyword(:base_string)
+  end
+
+  defp default_scope() do
+    ["openid", "profile", "email", "accounting.transactions"]
+  end
+  
 end

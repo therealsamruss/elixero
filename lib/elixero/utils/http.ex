@@ -1,7 +1,7 @@
 defmodule EliXero.Utils.Http do
 
   def user_agent do
-    "EliXero - " <> Application.get_env(:elixero, :consumer_key)
+    "EliXero - " <> Application.get_env(:elixero, :client_id)
   end
 
   @accept "application/json"

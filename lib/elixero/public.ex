@@ -1,6 +1,19 @@
 defmodule EliXero.Public do
+  
+  @www_form "application/x-www-form-urlencoded"
 
-  ### OAuth functions 
+  def get_access_token(authorize_code) do
+    access_token_url = EliXero.Utils.Urls.access_token()
+    body = EliXero.Utils.Auth.access_token_body(authorize_code)
+    headers = [EliXero.Utils.Auth.basic_header(), {"Content-Type", @www_form}]
+    
+    {:ok, response} = HTTPoison.post(access_token_url, body, headers)
+
+    resp = %{"http_status_code" => response.status_code}
+    Poison.decode!(response.body) |> Map.merge(resp)
+  end
+
+  ### OAuth functions
 
   def get_request_token do
     callback_url = URI.encode(Application.get_env(:elixero, :callback_url), &URI.char_unreserved?(&1))
