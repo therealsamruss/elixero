@@ -9,6 +9,10 @@ defmodule EliXero do
     |> do_create_client()
   end
 
+  def create_client(access_token, refresh_token, tenant_id) do
+    %EliXero.Client{access_token: access_token, tenant_id: tenant_id, refresh_token: refresh_token}
+  end
+
   def renew_client(client) do
     response = EliXero.Public.renew_access_token(client.refresh_token)
 
@@ -63,7 +67,7 @@ defmodule EliXero do
 				tenant_id: tenant_id,
 				refresh_token: refresh_token}}) do
 			  
-    %EliXero.Client{access_token: access_token, tenant_id: tenant_id, refresh_token: refresh_token}
+    create_client(access_token, refresh_token, tenant_id)
   end
   defp do_create_client({:error, _error} = response), do: response
   
