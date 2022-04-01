@@ -1,6 +1,7 @@
 defmodule EliXero.Public do
   
   @www_form "application/x-www-form-urlencoded"
+  @json "application/json"
 
   def get_access_token(authorize_code) do
     access_token_url = EliXero.Utils.Urls.access_token()
@@ -11,6 +12,16 @@ defmodule EliXero.Public do
 
     resp = %{"http_status_code" => response.status_code}
     Poison.decode!(response.body) |> Map.merge(resp)
+  end
+
+  def get_tenants(access_token) do
+    tenants_url = EliXero.Utils.Urls.tenants()
+    headers = [EliXero.Utils.Auth.bearer_header(access_token), {"Content-Type", @json}]
+
+    {:ok, response} = HTTPoison.get(tenants_url, headers)
+
+    resp = %{"http_status_code" => response.status_code}
+    %{"tenants" => Poison.decode!(response.body)} |> Map.merge(resp)
   end
 
   ### OAuth functions
@@ -45,19 +56,19 @@ defmodule EliXero.Public do
 
   ### Api functions
 
-  def find(access_token, resource, api_type) do
+  def find(client, resource, api_type) do
     url = EliXero.Utils.Urls.api(resource, api_type)
-    header = EliXero.Utils.Oauth.create_auth_header("GET", url, [oauth_token: access_token["oauth_token"]], access_token)
-    EliXero.Utils.Http.get(url, header)
+    headers = auth_headers(client)
+    EliXero.Utils.Http.get(url, headers)
   end
 
-  def find(access_token,resource, api_type, query_filters, extra_headers) do
+  def find(client, resource, api_type, query_filters, extra_headers) do
     url = EliXero.Utils.Urls.api(resource, api_type) |> EliXero.Utils.Urls.append_query_filters(query_filters)
-    header = EliXero.Utils.Oauth.create_auth_header("GET", url, [oauth_token: access_token["oauth_token"]], access_token)
-    EliXero.Utils.Http.get(url, header, extra_headers)
+    headers = auth_headers(client)
+    EliXero.Utils.Http.get(url, headers, extra_headers)
   end
 
-  def create(access_token, resource, api_type, data_map) do
+  def create(client, resource, api_type, data_map) do
     url = EliXero.Utils.Urls.api(resource, api_type)
 
     method =
@@ -65,17 +76,17 @@ defmodule EliXero.Public do
         :core -> "PUT"
       end
 
-    header = EliXero.Utils.Oauth.create_auth_header(method, url, [oauth_token: access_token["oauth_token"]], access_token)
+    headers = auth_headers(client)
 
     response =
       case(method) do
-        "PUT" -> EliXero.Utils.Http.put(url, header, data_map)
+        "PUT" -> EliXero.Utils.Http.put(url, headers, data_map)
       end
 
     response
   end
 
-  def update(access_token, resource, api_type, data_map) do
+  def update(client, resource, api_type, data_map) do
     url = EliXero.Utils.Urls.api(resource, api_type)
 
     method =
@@ -83,38 +94,46 @@ defmodule EliXero.Public do
         :core -> "POST"
       end
 
-    header = EliXero.Utils.Oauth.create_auth_header(method, url, [oauth_token: access_token["oauth_token"]], access_token)
+    headers = auth_headers(client)
 
     response =
       case(method) do
-        "POST" -> EliXero.Utils.Http.post(url, header, data_map)
+        "POST" -> EliXero.Utils.Http.post(url, headers, data_map)
       end
 
     response
   end
 
-  def delete(access_token, resource, api_type) do
+  def delete(client, resource, api_type) do
     url = EliXero.Utils.Urls.api(resource, api_type)
 
-    header = EliXero.Utils.Oauth.create_auth_header("DELETE", url, [oauth_token: access_token["oauth_token"]], access_token)
+    headers = auth_headers(client)
 
-    EliXero.Utils.Http.delete(url, header)
+    EliXero.Utils.Http.delete(url, headers)
   end
 
-  def upload_multipart(access_token, resource, api_type, path_to_file, name) do
+  def upload_multipart(client, resource, api_type, path_to_file, name) do
     url = EliXero.Utils.Urls.api(resource, api_type)
 
-    header = EliXero.Utils.Oauth.create_auth_header("POST", url, [oauth_token: access_token["oauth_token"]], access_token)
+    headers = auth_headers(client)
 
-    EliXero.Utils.Http.post_multipart(url, header, path_to_file, name)
+    EliXero.Utils.Http.post_multipart(url, headers, path_to_file, name)
   end
 
-  def upload_attachment(access_token, resource, api_type, path_to_file, filename, include_online) do
+  def upload_attachment(client, resource, api_type, path_to_file, filename, include_online) do
     url = EliXero.Utils.Urls.api(resource, api_type)
     url_for_signing = url <> "/" <> String.replace(filename, " ", "%20") <> "?includeonline=" <> ( if include_online, do: "true", else: "false") # Spaces must be %20 not +
-    header = EliXero.Utils.Oauth.create_auth_header("POST", url_for_signing, [oauth_token: access_token["oauth_token"]], access_token)
+    headers = auth_headers(client)
 
     url = url <> "/" <> URI.encode(filename, &URI.char_unreserved?(&1)) <> "?includeonline=" <> ( if include_online, do: "true", else: "false")
-    EliXero.Utils.Http.post_file(url, header, path_to_file)
+    EliXero.Utils.Http.post_file(url, headers, path_to_file)
   end
+
+  
+  defp auth_headers(client) do
+    bearer = client.access_token |> EliXero.Utils.Auth.bearer_header()
+    tenant = client.tenant_id |> EliXero.Utils.Auth.tenant_header()
+    [bearer, tenant]
+  end
+  
 end

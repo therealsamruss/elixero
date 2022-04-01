@@ -1,62 +1,58 @@
 defmodule EliXero.Utils.Http do
 
-  def user_agent do
-    "EliXero - " <> Application.get_env(:elixero, :client_id)
-  end
-
   @accept "application/json"
 
   @connection_timeout 330000
 
-  def get(url, authorisation_header) do
+  def get(url, authorization_headers) do
 
-    {:ok, response} = HTTPoison.get url, [{"Authorization", authorisation_header}, {"Accept", @accept}, {"User-Agent", user_agent()}], [{:recv_timeout, @connection_timeout}] # ++ [{:proxy, "127.0.0.1:8888"}]
+    {:ok, response} = HTTPoison.get url, authorization_headers ++ [{"Accept", @accept}], [{:recv_timeout, @connection_timeout}] # ++ [{:proxy, "127.0.0.1:8888"}]
 
     response
   end
 
-  def get(url, authorisation_header, extra_headers) do
-    headers = [{"Authorization", authorisation_header}, {"Accept", @accept}, {"User-Agent", user_agent()}] ++ extra_headers
+  def get(url, authorization_headers, extra_headers) do
+    headers = authorization_headers ++ [{"Accept", @accept}] ++ extra_headers
 
     {:ok, response} = HTTPoison.get url, headers, [{:recv_timeout, @connection_timeout}] # ++ [{:proxy, "127.0.0.1:8888"}]
 
     response
   end
 
-  def put(url, authorisation_header, data_map) do
+  def put(url, authorization_headers, data_map) do
     {_, payload} = Poison.encode(data_map)
 
-    {:ok, response} = HTTPoison.put url, payload, [{"Authorization", authorisation_header}, {"Accept", @accept}, {"User-Agent", user_agent()}], [{:recv_timeout, @connection_timeout}] # ++ [{:proxy, "127.0.0.1:8888"}]
+    {:ok, response} = HTTPoison.put url, payload, authorization_headers ++ [{"Accept", @accept}], [{:recv_timeout, @connection_timeout}] # ++ [{:proxy, "127.0.0.1:8888"}]
 
     response
   end
 
-  def post(url, authorisation_header, data_map) do
+  def post(url, authorization_headers, data_map) do
     {_, payload} = Poison.encode(data_map)
 
-    {:ok, response} = HTTPoison.post url, payload, [{"Authorization", authorisation_header}, {"Accept", @accept}, {"User-Agent", user_agent()}], [{:recv_timeout, @connection_timeout}] # ++ [{:proxy, "127.0.0.1:8888"}]
+    {:ok, response} = HTTPoison.post url, payload, authorization_headers ++ [{"Accept", @accept}], [{:recv_timeout, @connection_timeout}] # ++ [{:proxy, "127.0.0.1:8888"}]
 
     response
   end
 
-  def delete(url, authorisation_header) do
-    {:ok, response} = HTTPoison.delete url, [{"Authorization", authorisation_header}, {"Accept", @accept}, {"User-Agent", user_agent()}], [{:recv_timeout, @connection_timeout}] # ++ [{:proxy, "127.0.0.1:8888"}]
+  def delete(url, authorization_headers) do
+    {:ok, response} = HTTPoison.delete url, authorization_headers ++ [{"Accept", @accept}], [{:recv_timeout, @connection_timeout}] # ++ [{:proxy, "127.0.0.1:8888"}]
 
     response
   end
 
-  def post_multipart(url, authorisation_header, path_to_file, name) do
+  def post_multipart(url, authorization_headers, path_to_file, name) do
     # The Xero Files API grabs the filename out of the content-disposition header of the multipart file request.
     # Hackney sets this to be the filename from the path of the file. We need to override it
     content_disposition_overload = "form-data; filename=\"" <> name <> "\""
 
-    {:ok, response} = HTTPoison.post url, {:multipart, [{:file, path_to_file, [{"Content-Disposition", content_disposition_overload}]}]}, [{"Authorization", authorisation_header}, {"Accept", @accept}, {"User-Agent", user_agent()}], [{:recv_timeout, @connection_timeout}] # ++ [{:proxy, "127.0.0.1:8888"}]
+    {:ok, response} = HTTPoison.post url, {:multipart, [{:file, path_to_file, [{"Content-Disposition", content_disposition_overload}]}]}, authorization_headers ++ [{"Accept", @accept}], [{:recv_timeout, @connection_timeout}] # ++ [{:proxy, "127.0.0.1:8888"}]
 
     handle_response(response)
   end
 
-  def post_file(url, authorisation_header, path_to_file) do
-    {:ok, response} = HTTPoison.post url, {:file, path_to_file}, [{"Authorization", authorisation_header}, {"Accept", @accept}, {"User-Agent", user_agent()}], [{:recv_timeout, @connection_timeout}] # ++ [{:proxy, "127.0.0.1:8888"}]
+  def post_file(url, authorization_headers, path_to_file) do
+    {:ok, response} = HTTPoison.post url, {:file, path_to_file}, authorization_headers ++ [{"Accept", @accept}], [{:recv_timeout, @connection_timeout}] # ++ [{:proxy, "127.0.0.1:8888"}]
 
     response
   end

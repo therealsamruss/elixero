@@ -3,7 +3,7 @@ defmodule EliXero do
     response = EliXero.Public.get_request_token
 
     case response do
-      %{"http_status_code" => 200}  -> Map.merge(response, %{"auth_url" => EliXero.Utils.Urls.authorise(response["oauth_token"])})
+      %{"http_status_code" => 200}  -> Map.merge(response, %{"auth_url" => EliXero.Utils.Urls.authorize(response["oauth_token"])})
       _                             -> response
     end
   end  

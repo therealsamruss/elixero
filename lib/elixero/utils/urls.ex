@@ -4,7 +4,7 @@ defmodule EliXero.Utils.Urls do
   @base_url "https://api.xero.com/"
   @authorize_url "https://login.xero.com/identity/connect/authorize"
   @access_token_url "https://identity.xero.com/connect/token"
-  @tenants_url @base_url <> "connection"
+  @tenants_url @base_url <> "connections"
 
   #api_types
   @core_api "api.xro/2.0/"

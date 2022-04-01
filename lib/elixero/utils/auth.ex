@@ -11,6 +11,10 @@ defmodule EliXero.Utils.Auth do
     {"Authorization", "Bearer " <> token}
   end
 
+  def tenant_header(tenant_id) do
+    {"Xero-Tenant-Id", tenant_id}
+  end
+
   def access_token_body(authorize_code) do
     [
       {:grant_type, "authorization_code"},
