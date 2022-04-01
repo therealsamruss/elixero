@@ -23,4 +23,12 @@ defmodule EliXero.Utils.Auth do
     ]
     |> EliXero.Utils.Helpers.join_params_keyword(:base_string)
   end
+
+  def refresh_token_body(refresh_token) do
+    [
+      {:grant_type, "refresh_token"},
+      {:refresh_token, refresh_token}
+    ]
+    |> EliXero.Utils.Helpers.join_params_keyword(:base_string)
+  end
 end

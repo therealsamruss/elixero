@@ -1,12 +1,4 @@
 defmodule EliXero do
-  def get_request_token do
-    response = EliXero.Public.get_request_token
-
-    case response do
-      %{"http_status_code" => 200}  -> Map.merge(response, %{"auth_url" => EliXero.Utils.Urls.authorize(response["oauth_token"])})
-      _                             -> response
-    end
-  end  
 
   def create_client(authorize_code) do
     authorize_code
@@ -18,10 +10,13 @@ defmodule EliXero do
   end
 
   def renew_client(client) do
-    response = EliXero.Public.renew_access_token(client.access_token)
+    response = EliXero.Public.renew_access_token(client.refresh_token)
 
     case response do
-      %{"http_status_code" => 200}  -> create_client response
+      %{"http_status_code" => 200}  ->
+	%{client |
+	  access_token: response["access_token"],
+	  refresh_token: response["refresh_token"]}
       _                             -> response
     end 
   end
