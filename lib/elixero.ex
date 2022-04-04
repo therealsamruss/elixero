@@ -1,12 +1,16 @@
 defmodule EliXero do
 
-  def create_client(authorize_code) do
+  def create_client(authorize_code) when is_binary(authorize_code) do
     authorize_code
     |> get_access_token()
     |> get_tenants()
     |> get_auth_event_id()
     |> get_tenant_id()
     |> do_create_client()
+  end
+
+  def create_client(%{access_token: _at, refresh_token: _rt, tenant_id: _ti} = map) do
+    struct(EliXero.Client, map)
   end
 
   def create_client(access_token, refresh_token, tenant_id) do
