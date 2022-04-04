@@ -55,7 +55,37 @@ end
   end
 ```
 
-3. The returned *client* structure looks as such:
+3. Add routes:
+
+```
+defmodule MyAppWeb.Router do
+  use MyAppWeb, :router
+
+  pipeline :browser do
+    plug :accepts, ["html"]
+    plug :fetch_session
+    plug :fetch_live_flash
+    plug :put_root_layout, {WbAdminWeb.LayoutView, :root}
+    plug :protect_from_forgery
+    plug :put_secure_browser_headers
+  end
+
+  pipeline :api do
+    plug :accepts, ["json"]
+  end
+
+  scope "/", MyAppWeb do
+    pipe_through :browser
+
+    get "/", PageController, :index
+    post "/auth", AuthController, :authorize
+    get "/callback", AuthController, :auth_callback
+  end
+```
+
+Note: the callback path has to conform with your callback_url in the config and what you set on the Xero developer portal!
+
+4. The returned *client* structure looks as such:
 
 ```
 %EliXero.Client{
@@ -67,7 +97,7 @@ end
 
 Store these data in a database or session cookie so you can fetch it when you want to make an API call.
 
-4. Renew the tokens:
+5. Renew the tokens:
 
 ```
 client = EliXero.renew_client(client_from_database)
@@ -75,7 +105,7 @@ client = EliXero.renew_client(client_from_database)
 
 You will have to do it every 30 minutes in a periodic background job in order to keep your tokens valid. Otherwise you need to fetch new tokens with the above mentioned authorization process, which involves a manual click in the browser prompt.
 
-5. Access the API:
+6. Access the API:
 
 ```
 client = EliXero.create_client(access_token_from_db, refresh_token_from_db, tenant_id_from_db)
