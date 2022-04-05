@@ -16,9 +16,9 @@ defmodule EliXero.Mixfile do
 
   defp deps do
     [
-      {:httpoison, "~> 0.9"},
+      {:httpoison, "~> 1.8"},
       {:ex_doc, ">= 0.0.0", only: :dev},
-      {:poison, "~> 3.0"},
+      {:jason, "~> 1.2"},
       {:ecto, "~> 3.7.2"}
     ]
   end
