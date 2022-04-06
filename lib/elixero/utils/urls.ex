@@ -12,13 +12,14 @@ defmodule EliXero.Utils.Urls do
   @files_api "files.xro/1.0/"
   @assets_api "assets.xro/1.0/"
 
-  def authorize() do
-    EliXero.Utils.Helpers.random_string(8)
-    |> authorize()
+  def authorize(opts \\ []) do
+    validator = Keyword.get(opts, :validator, EliXero.Utils.Helpers.random_string(8))
+    scope = Keyword.get(opts, :scope, []) ++ default_scope() |> Enum.uniq()
+    authorize(validator, scope)
   end
   
-  def authorize(validator) do
-    @authorize_url <> "?" <> authorize_params(validator)
+  def authorize(validator, scope) do
+    @authorize_url <> "?" <> authorize_params(validator, scope)
   end
   
   def access_token do
@@ -49,10 +50,6 @@ defmodule EliXero.Utils.Urls do
     end
 
     url <> "?" <> query_param_string
-  end
-
-  defp authorize_params(validator) do
-    authorize_params(validator, default_scope())
   end
   
   defp authorize_params(validator, scope) do
