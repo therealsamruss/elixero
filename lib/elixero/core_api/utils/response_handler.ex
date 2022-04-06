@@ -5,7 +5,7 @@ defmodule EliXero.CoreApi.Utils.ResponseHandler do
             %{:status_code => 204}  -> %{:status_code => 204, :message => "No Content"}
             %{:status_code => 400}  -> transform response.body, expected_model, :bad_request
             %{:status_code => 500}  -> transform_to_api_exception response.body
-            _                       -> %{:status_code => response.status_code, :message => Poison.decode!(response.body)}
+            _                       -> %{:status_code => response.status_code, :message => json_decode(response.body)}
         end
     end
 
@@ -29,5 +29,12 @@ defmodule EliXero.CoreApi.Utils.ResponseHandler do
             {:ok, data} -> EliXero.CoreApi.Models.Exceptions.ApiException.from_map data
             _ -> "Something went wrong transforming to module"
         end
+    end
+
+    defp json_decode(body) do
+      case Poison.decode(body) do
+	{:ok, result} -> result
+	{:error, _} -> body
+      end
     end
 end
