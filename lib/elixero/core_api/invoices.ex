@@ -32,7 +32,7 @@ defmodule EliXero.CoreApi.Invoices do
   def online_invoice_url(client, identifier) do
     resource = @resource <> "/" <> identifier <> "/OnlineInvoice"
 
-    EliXero.Public.find(client.access_token, resource, @api_type)
+    EliXero.Public.find(client, resource, @api_type)
     |> EliXero.CoreApi.Utils.ResponseHandler.handle_response(@online_invoices_model_module)
   end
 end
