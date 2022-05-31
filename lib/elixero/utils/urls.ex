@@ -4,6 +4,7 @@ defmodule EliXero.Utils.Urls do
   @base_url "https://api.xero.com/"
   @authorize_url "https://login.xero.com/identity/connect/authorize"
   @access_token_url "https://identity.xero.com/connect/token"
+  @revoke_token_url "https://identity.xero.com/connect/revocation"
   @tenants_url @base_url <> "connections"
 
   #api_types
@@ -24,6 +25,10 @@ defmodule EliXero.Utils.Urls do
   
   def access_token do
     @access_token_url
+  end
+
+  def revoke_token do
+    @revoke_token_url
   end
 
   def tenants do

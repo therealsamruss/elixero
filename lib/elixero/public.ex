@@ -35,6 +35,16 @@ defmodule EliXero.Public do
     %{"tenants" => Poison.decode!(response.body)} |> Map.merge(resp)
   end
 
+  def revoke_token(refresh_token) do
+    revoke_token_url = EliXero.Utils.Urls.revoke_token()
+    body = EliXero.Utils.Auth.revoke_token_body(refresh_token)
+    headers = [EliXero.Utils.Auth.basic_header(), {"Content-Type", @www_form}]
+
+    {:ok, response} = HTTPoison.post(revoke_token_url, body, headers)
+
+    _resp = %{"http_status_code" => response.status_code}
+  end
+
 
   ### Api functions
 

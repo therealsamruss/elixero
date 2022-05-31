@@ -31,4 +31,11 @@ defmodule EliXero.Utils.Auth do
     ]
     |> EliXero.Utils.Helpers.join_params_keyword(:base_string)
   end
+
+  def revoke_token_body(refresh_token) do
+    [
+      {:token, refresh_token}
+    ]
+    |> EliXero.Utils.Helpers.join_params_keyword(:base_string)
+  end
 end

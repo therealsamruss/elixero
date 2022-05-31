@@ -29,6 +29,15 @@ defmodule EliXero do
     end 
   end
 
+  def revoke_client(client) do
+    response = EliXero.Public.revoke_token(client.refresh_token)
+
+    case response do
+      %{"http_status_code" => 200}  -> {:ok, client}
+      _                             -> {:error, response}
+    end
+  end
+
 
   defp get_access_token(authorize_code) do
     response = EliXero.Public.get_access_token(authorize_code)
