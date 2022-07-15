@@ -20,7 +20,7 @@ defmodule EliXero.CoreApi.Attachments do
   def upload_attachment(client, endpoint, identifier, filename, file_path, include_online) do
     resource = endpoint <> "/" <> identifier <> "/" <> @resource
 
-    EliXero.Public.upload_attachment(client.access_token, resource, @api_type, file_path, filename, include_online)
+    EliXero.Public.upload_attachment(client, resource, @api_type, file_path, filename, include_online)
     |> EliXero.CoreApi.Utils.ResponseHandler.handle_response(@model_module)
   end
 end
