@@ -28,6 +28,10 @@ defmodule EliXero.CoreApi.Common do
     EliXero.Public.create(client, resource, @api_type, object_map)
   end
 
+  def update(client, resource, object_map) do
+    EliXero.Public.update(client, resource, @api_type, object_map)
+  end
+
   def update(client, resource, identifier, object_map) do
     resource = resource <> "/" <> identifier
 

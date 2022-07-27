@@ -24,6 +24,11 @@ defmodule EliXero.CoreApi.Invoices do
     |> EliXero.CoreApi.Utils.ResponseHandler.handle_response(@model_module)
   end
 
+  def update(client, invoices_map) do
+    EliXero.CoreApi.Common.update(client, @resource, invoices_map)
+    |> EliXero.CoreApi.Utils.ResponseHandler.handle_response(@model_module)
+  end
+
   def update(client, identifier, invoices_map) do
     EliXero.CoreApi.Common.update(client, @resource, identifier, invoices_map)
     |> EliXero.CoreApi.Utils.ResponseHandler.handle_response(@model_module)
