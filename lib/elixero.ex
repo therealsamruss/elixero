@@ -17,7 +17,7 @@ defmodule EliXero do
     %EliXero.Client{access_token: access_token, tenant_id: tenant_id, refresh_token: refresh_token}
   end
 
-  def renew_client(client) do
+  def renew_client(%EliXero.Client{} = client) do
     response = EliXero.Public.renew_access_token(client.refresh_token)
 
     case response do
@@ -26,7 +26,24 @@ defmodule EliXero do
 	  access_token: response["access_token"],
 	  refresh_token: response["refresh_token"]}
       _                             -> response
-    end 
+    end
+  end
+
+  def renew_client(refresh_token) do
+    response = EliXero.Public.renew_access_token(refresh_token)
+
+    case response do
+      %{"http_status_code" => 200}  ->
+	      {:ok, %{
+          access_token: response["access_token"],
+          refresh_token: response["refresh_token"]
+        }}
+        |> get_tenants()
+        |> get_auth_event_id()
+        |> get_tenant_id()
+        |> do_create_client()
+      _ -> response
+    end
   end
 
   def revoke_client(client) do
@@ -71,8 +88,16 @@ defmodule EliXero do
   defp get_auth_event_id({:error, _error} = response), do: response
 
   defp get_tenant_id({:ok, %{tenants: tenants, auth_event_id: auth_event_id} = data}) do
-    current_tenant = Enum.find(tenants, fn t -> t["authEventId"] == auth_event_id end)
-    {:ok, Map.put(data, :tenant_id, current_tenant["tenantId"])}
+    case Enum.find(tenants, fn t -> t["authEventId"] == auth_event_id end) do
+      nil ->
+        if Enum.empty?(tenants) do
+          {:error, %{error: "No tenant found."}}
+        else
+          current_tenant = tenants |> hd()
+          {:ok, Map.put(data, :tenant_id, current_tenant["tenantId"])}
+        end
+      current_tenant -> {:ok, Map.put(data, :tenant_id, current_tenant["tenantId"])}
+    end
   end
   defp get_tenant_id({:error, _error} = response), do: response
 
